@@ -13,6 +13,7 @@ on:
         options:
          - openedx
          - edx
+         - SalmanOrg2023
       repos_list:
         description: "List of repositories in the format 'x', 'y', 'z'..."
         type: string
@@ -108,7 +109,7 @@ jobs:
       
       - name: Ensure script is executable
         run: chmod +x ${{ github.event.inputs.script }}   
-        
+
       - name: run script
         run: ${{ github.event.inputs.script }}
 
