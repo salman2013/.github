@@ -105,7 +105,10 @@ jobs:
       - name: install packages
         if: ${{ github.event.inputs.packages }}
         run: pip install ${{ github.event.inputs.packages }}
-
+      
+      - name: Ensure script is executable
+        run: chmod +x ${{ github.event.inputs.script }}   
+        
       - name: run script
         run: ${{ github.event.inputs.script }}
 
