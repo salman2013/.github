@@ -62,7 +62,7 @@ on:
 jobs:
 
   repos_list:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     outputs:
       output1: ${{ steps.repos_list.outputs.list }}
@@ -74,19 +74,22 @@ jobs:
         echo "list=[${{github.event.inputs.repos_list}}]" >> $GITHUB_OUTPUT
 
   bulk_update:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [ repos_list ]
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         repos: ${{fromJson(needs.repos_list.outputs.output1)}}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
             repository: ${{ github.event.inputs.organization}}/${{ matrix.repos }}
             token: ${{ secrets.requirements_bot_github_token }}
             fetch-depth: 0
+            persist-credentials: false
 
       - name: Get Default Branch of checkedout repo
         run: |
@@ -94,12 +97,12 @@ jobs:
           echo "BRANCH=$branch" >> $GITHUB_ENV
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ github.event.inputs.python_version }}
 
       - name: Setup Nodejs
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 16
 
@@ -111,6 +114,8 @@ jobs:
         run: chmod +x ${{ github.event.inputs.script }}   
 
       - name: run script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ${{ github.event.inputs.script }}
 
       - name: setup pull_request_creator
